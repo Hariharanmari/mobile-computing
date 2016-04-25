@@ -1,0 +1,45 @@
+#!/usr/bin/python
+
+import RPi.GPIO as GPIO
+import time
+import binascii
+
+GPIO.setmode(GPIO.BCM)
+
+GPIO.setup(17, GPIO.IN)
+
+def text_from_bits(bits, encoding='utf-8', errors='surrogatepass'):
+    n = int(bits, 2)
+    return int2bytes(n).decode(encoding, errors)
+
+def int2bytes(i):
+    hex_string = '%x' % i
+    n = len(hex_string)
+    return binascii.unhexlify(hex_string.zfill(n + (n & 1)))
+
+
+value_bit = ""
+j = 0
+
+while True:
+	print GPIO.input(17)
+	print j
+	if GPIO.input(17) == 0 :
+		j+=1
+	elif GPIO.input(17) == 1 : 
+		j=0
+	time.sleep(1)
+	if j == 4 :
+		while True :
+			for x in range(0,8):
+				value = GPIO.input(17)	
+				if value == 1 :
+					value_bit+=str(0)
+				if value == 0 :
+					value_bit+=str(1)
+				time.sleep(1)	
+			print value_bit			
+			print text_from_bits(value_bit)
+			
+
+
